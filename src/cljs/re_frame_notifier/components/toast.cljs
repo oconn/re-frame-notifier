@@ -12,5 +12,5 @@
    duration)
 
   [:p
-   {:class (str "re-frame-notifier-toast " (name status) "-toast")}
+   {:class (str "notifier-toast " (name status) "-toast")}
    message])
