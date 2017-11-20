@@ -1,28 +1,37 @@
 (ns re-frame-notifier.events
-  (:require [re-frame.core :refer [reg-event-db]]
+  (:require [re-frame.core :refer [reg-event-fx
+                                   reg-fx]]
             [re-frame-notifier.helpers :refer [random-id
                                                pluralize-keyword
                                                keywordize-str]]))
 
+(defn- lockable
+  "Determines if a notification type is \"lockable\" (screen should not scroll)"
+  [notification-type]
+  (boolean (#{:alerts :modals} notification-type)))
+
 (defn- add-notification-of-type
   "Adds a notification to its namespaced collection"
   [notification-type]
-  (fn [db [_ notification]]
-    (update-in db
-               [:notifier notification-type]
-               #(conj % (assoc notification :id (random-id))))))
+  (fn [{:keys [db]} [_ notification]]
+    (cond-> {:db (update-in db
+                            [:notifier notification-type]
+                            #(conj % (assoc notification :id (random-id))))}
+      (lockable notification-type) (assoc :notifier/lock-screen true))))
 
 (defn- clear-active-notification-of-type
   "Removes the first notification from its namespaced collection"
   [notification-type]
-  (fn [db _]
-    (update-in db [:notifier notification-type] #(vec (rest %)))))
+  (fn [{:keys [db]} _]
+    (cond-> {:db (update-in db [:notifier notification-type] #(vec (rest %)))}
+      (lockable notification-type) (assoc :notifier/lock-screen false))))
 
 (defn- clear-notifications-of-type
   "Resets the namespaced notification collection"
   [notification-type]
-  (fn [db _]
-    (assoc-in db [:notifier notification-type] [])))
+  (fn [{:keys [db]} _]
+    (cond-> {:db (assoc-in db [:notifier notification-type] [])}
+      (lockable notification-type) (assoc :notifier/lock-screen false))))
 
 (defn- register-events-for-notification-type
   "Registers all the events for a notifcation namespace (alert, modal, toast)"
@@ -31,20 +40,27 @@
                              clear-all
                              notifier-interceptors]}]
 
-  (reg-event-db
+  (reg-event-fx
    (keywordize-str "notifier/create-" notification-type)
    (into notifier-interceptors create)
    (add-notification-of-type (pluralize-keyword notification-type)))
 
-  (reg-event-db
+  (reg-event-fx
    (keywordize-str "notifier/clear-active-" notification-type)
    (into notifier-interceptors clear-active)
    (clear-active-notification-of-type (pluralize-keyword notification-type)))
 
-  (reg-event-db
+  (reg-event-fx
    (keywordize-str "notifier/clear-" notification-type "s")
    (into notifier-interceptors clear-all)
-   (clear-notifications-of-type (pluralize-keyword notification-type))))
+   (clear-notifications-of-type (pluralize-keyword notification-type)))
+
+  (reg-fx
+   :notifier/lock-screen
+   (fn [lock-screen]
+     (if lock-screen
+       (-> js/document .-body .-classList (.add "no-scroll"))
+       (-> js/document .-body .-classList (.remove "no-scroll"))))))
 
 (defn register-events
   [{:keys [clear-active-alert-interceptors
