@@ -53,14 +53,7 @@
   (reg-event-fx
    (keywordize-str "notifier/clear-" notification-type "s")
    (into notifier-interceptors clear-all)
-   (clear-notifications-of-type (pluralize-keyword notification-type)))
-
-  (reg-fx
-   :notifier/lock-screen
-   (fn [lock-screen]
-     (if lock-screen
-       (-> js/document .-body .-classList (.add "no-scroll"))
-       (-> js/document .-body .-classList (.remove "no-scroll"))))))
+   (clear-notifications-of-type (pluralize-keyword notification-type))))
 
 (defn register-events
   [{:keys [clear-active-alert-interceptors
@@ -103,4 +96,11 @@
    {:create create-toast-interceptors
     :clear-active clear-active-toast-interceptors
     :clear-all clear-toasts-interceptors
-    :notifier-interceptors notifier-interceptors}))
+    :notifier-interceptors notifier-interceptors})
+
+  (reg-fx
+   :notifier/lock-screen
+   (fn [lock-screen]
+     (if lock-screen
+       (-> js/document .-body .-classList (.add "no-scroll"))
+       (-> js/document .-body .-classList (.remove "no-scroll"))))))
