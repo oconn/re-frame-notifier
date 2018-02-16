@@ -8,8 +8,10 @@
            dismiss-button-class
            modal-container-class
            modal-component-container-class
-           modal-underlay-class]
+           modal-underlay-class
+           close-btn-display]
     :or {component-props nil
+         close-btn-display [:span "Close"]
          hide-dismiss false
          dismiss-button-class "notifier-dismiss-button"
          modal-container-class "notifier-modal-container"
@@ -21,6 +23,6 @@
       [:button
        {:class dismiss-button-class
         :on-click (action-and-close identity :modal)}
-       "X"])
+       close-btn-display])
     [:div {:class modal-component-container-class}
      [component component-props]]]])
