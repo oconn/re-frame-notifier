@@ -1,6 +1,6 @@
 (set-env! :resource-paths #{"src/cljs"}
           :source-paths   #{"test/cljs"}
-          :dependencies   '[[org.clojure/clojurescript "1.9.946" :scope "provided"]
+          :dependencies   '[[org.clojure/clojurescript "1.10.439" :scope "provided"]
                             [re-frame                  "0.10.2"  :scope "provided"]
 
                             [adzerk/bootlaces  "0.1.13" :scope "test"]
@@ -11,7 +11,7 @@
          '[boot.git         :refer [last-commit]])
 
 (def project 'oconn/re-frame-notifier)
-(def +version+ "0.1.0-SNAPSHOT")
+(def +version+ "0.1.1-SNAPSHOT")
 
 (task-options!
  pom {:project     project

@@ -19,7 +19,7 @@
     (re-frame/dispatch [(keywordize-str "notifier/clear-active-"
                                         notification-type)])))
 
-(defn- random-id
+(defn random-id
   "Returns a random string id."
   []
   (-> js/window
@@ -28,7 +28,7 @@
       (.toString 36)
       (.substr 2 10)))
 
-(defn- pluralize-keyword
+(defn pluralize-keyword
   "Takes a keyword and adds an 's'."
   [k]
   (-> k
