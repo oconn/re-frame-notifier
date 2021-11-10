@@ -1,11 +1,11 @@
-{:paths ["src"]
+{:paths ["src/cljs"]
 
  :deps {re-frame/re-frame  {:mvn/version "0.10.6"}}
 
  :aliases {:test
            {:extra-deps {org.clojure/clojurescript {:mvn/version "1.10.520"}
                          olical/cljs-test-runner {:mvn/version "3.2.0"}}
-            :extra-paths ["test"]
+            :extra-paths ["test/cljs"]
             :main-opts ["-m" "cljs-test-runner.main"]}
 
            :pack
